@@ -1,403 +1,133 @@
-//  second round 
-
 #include<bits/stdc++.h>
-#include <time.h>
-#include<conio.h>
-#include<vector>
-#include<map>
-#include<string.h>
-#include<algorithm>
-#include<math.h>
-#include <unistd.h>
-#include<stdlib.h>
 using namespace std;
-
-#define ll  int
-#define mod 1000000007
-#define pd push_back
-
-string s3 = "\t\t\t";
-ll unique_id=0;
-
-
-
-// structre to create node
-struct node{
-	
-	struct  data{
-		string name;
-		string address;
-		string number;
-		string phone;
-		string password;
-	};  
-	
-	data *info= new data;  
-	string time_stamp;
-	ll node_number;
-	ll node_uniqid;
-	ll parent_address;
-	ll enc_key;
-	ll sub_node=-1;
-	
-	struct node * next =NULL;
-	
-	node * subnode[99999] ={NULL};	
-	
+struct TIMESTAMP
+{// a structure for date 
+	int day;
+	int month;
+	int year;
 };
 
-//  Substitution encryption and decryption 
+struct DATA
+{// structure for storing the data like owner id ,value ,owner name
+	string ownerId;
+	float value;
+	string ownerName;
+	string hashset;
+};
 
-string encrypt(string  str, int key){
-	
-	key=key%27;
-	
-	for(int i = 0; (i < 100 && str[i] != '\0'); i++)
-            str[i] = str[i] + key; 
+struct Node
+{// a structure representing the model of a node
+	struct TIMESTAMP timestamp;
+	struct DATA data;	
+	int nodenumber;
+	string nodeid;
+       	struct Node *referenceNodeId;
+	vector<struct Node*>childReferenceNodeId;
+	string hashvalue; 
+};
 
-	return str;	
+string encrypt(string input)
+{	//function for encrypting the string input
+	reverse(input.begin(),input.end());
+		
+	return(input);
 }
-
-string decrypt(string  str, int key){
-	
-	 key=key%27;
-	
-	 for(int i = 0; (i < 100 && str[i] != '\0'); i++)
-    	     str[i] = str[i] - key;       
-	 return str;	
-}
-
-//  checking of data
-
-bool check(){
-	if(unique_id == 0){
-		cout<<"\n\n\n\t\t\tPlease fill main list first :"<<endl;
-		sleep(2);
-		return 1;
-	}
-}
-
-
-// generate unique number
-int generateUniqueInt()
+string decrypt(string input)
 {
-  int a= abs((((rand()*999999999)/13)*17)*3);
-  
-  return a;
+	//function for decrypting the string input
+	reverse(input.begin(),input.end());
+	return(input);
 }
-
-
-// time stamp
-string gettime(){
-	char temp[100]; 
-	
-        time_t current_time = time(NULL);
-        struct tm *tm = localtime(&current_time);
-        strftime(temp, sizeof(temp), "%c", tm);
-        return temp;
+float encryptv(float inp)
+{
+	//function for encrypting the float input 
+	return(inp+100);
 }
-
-
-// creating new node
-node * createnode( node * head,  ll parent_id, ll total_node ){
-	
-	string name,address,number,phone,password;
-	int key;
-	head = new node;
-		
-	
-	
-		cout<<" Enter the name of the user \t"<<endl;	 cin>>name; 
-		cout<<"	Address"<<"\t"<<endl; 				 cin>>address; 
-		cout<<"	Number"<<"\t"<<endl; 		     		 cin>>number; 
-		cout<<"	Phone"<<"\t"<<endl;				 cin>>phone; 
-		cout<<"	Password"<<"\t"<<endl;				 cin>>password; 
-		cout<<"	Encrypt-Key"<<"\t"<<endl;			 cin>>key;
-	
-	
-		
-		head->time_stamp = gettime();
-		head->info->name=encrypt(name,key);
-		head->info->address=encrypt(address,key);
-		head->info->number=encrypt(number,key);
-		head->info->phone=encrypt(phone,key);
-		head->info->password=encrypt(password,key);
-		head->enc_key=key;
-		
-		head->node_number=total_node;
-		head->parent_address=parent_id;
-		head->node_uniqid=generateUniqueInt();
-		head->next=NULL;
-			
-	return head;
+float decryptv(float inp)
+{//function for decrypting the float value
+	return(inp-100);
 }
-
-
-//  create node combine
-node * setnode(int total_node){
-	
-	bool start=0;
-	node * head, * temp;
-	
-	 for(int i=0;i<total_node;i++){
-	 	if(start==0){
-	 		head = createnode(head,0,++unique_id);
-	 		temp=head;
-	 		start=1;
-		 }else{ 	
-		 	temp->next=createnode(head,temp->node_number,++unique_id);
-		 	temp=temp->next;
-		 	
-		 }
-	 }
-}
-
-
-// Recursion Search for all sub node maximum lenght 
-int chech_all_subnode_max_lenght(node *temp){
-	
-	int subcount=0,nextcount=0;
-		
-	if(temp->sub_node != -1){
-		
-		for(int i=temp->sub_node; i>=0; i--){
-			
-			subcount = max(subcount , chech_all_subnode_max_lenght( temp->subnode[temp->sub_node] ) );
-			
-		}	
-	}	
-	if(temp->next != NULL){
-		
-		nextcount = chech_all_subnode_max_lenght(temp->next);
-		
-	}	
-	
-	return (max(subcount , nextcount) + 1);
-	
-}
-
-int main(){
-	
-	ios::sync_with_stdio(0); cin.tie(0);
-	 
-	int total_node, total_subnode, parent_id, module, node_id;
-	node *head, * subnode, *temp, * oneadd, *extra_temp;
-	
-	do{
-		
-	cout<<"\n\n\n"<<s3<<"1  To create first node "<<endl<<endl;
-	cout<<s3<<"2  To create sub-node "<<endl<<endl;
-	cout<<s3<<"3  To adding new node "<<endl<<endl;
-	cout<<s3<<"4  To break any node or subnode"<<endl<<endl;
-	cout<<s3<<"5  To transfer owner of node or sub node to other owner"<<endl<<endl;
-	cout<<s3<<"6  To Find the longest chain of main node "<<endl<<endl;
-	cout<<s3<<"7  To Find the longest chain of sub node of a main node"<<endl<<endl;
-	cout<<s3<<"8  To Merge two different set of node"<<endl<<endl;
-	cout<<s3<<"0  For exit"<<endl<<endl;
-	
-	
-	
-	cin>>module;
-	system("CLS");
-	switch(module){
-		
-		case 1:{
-			
-			cout<<s3<<"enter the total number of nodes : "<<endl;
-			cin>>total_node;
-			cout<<endl<<endl;
-			
-			head = setnode(total_node);
-			break;
-			}
-		
-		case 2:{
-			
-			if(check()){
-				break;
-			}
-			
-			cout<<s3<<"enter the total number of nodes and the parent node number "<<endl;
-			cin>>total_node>>parent_id;
-			
-			
-			
-			subnode = setnode(total_node);
-			
-			temp = head;
-				while(parent_id--){
-					temp=temp->next;
-				}
-			
-			temp->subnode[++temp->sub_node] = temp;
-			
-			break;
-		}
-		
-		case 3:{
-			
-			cout<<s3<<"Enter the node id on which you want to add new node between them";
-			cin>>node_id;
-			
-			node_id--;
-			temp=head;
-			
-			while(node_id--){
-				temp=temp->next;
-			}
-			
-			oneadd = createnode(head,temp->node_number,temp->node_number);
-			
-			oneadd->next=temp->next;
-			temp->next=oneadd;
-			
-			
-//			change all reamining node_number
-			while(oneadd!=NULL){
-				oneadd=oneadd->next;
-				oneadd->node_number++;
-			}
-			
-			break;
-		}
-		
-		case 4:{
-			
-			int ccondition;
-			
-			cout<<s3<<"To break any node press     1"<<endl<<endl;
-			cout<<s3<<"To break any subnode        2"<<endl<<endl;
-			
-			cin>>ccondition;
-			
-			switch(ccondition){
-				
-				case 1:{
-					// delete node
-					cout<<s3<<"Enter the node id number"<<endl<<endl;
-					cin>>node_id;
-					node_id--;
-					
-					temp = head;
-					
-					while(node_id--){
-						temp=temp->next;
-					}
-					
-					temp->next=temp->next->next;
-					
-					temp=temp->next;
-					
-				//	set remaining node number
-				
-					while(temp!=NULL){
-						temp->node_number--;
-						temp=temp->next;
-					}
-					
-					break;
-				}
-				
-				case 2:{
-					
-					cout<<s3<<"Enter the parent id of subnode "<<endl<<endl;
-					cin>>node_id;
-					
-					node_id--;
-					
-					temp=head;
-					while(node_id--){
-						temp=temp->next;
-					}
-					
-					if(temp->subnode[temp->sub_node]->sub_node == -1){
-						cout<<"Their is no sub node under this node,  Check again";
-					}else{
-						temp->subnode[temp->sub_node] = NULL;
-						temp->sub_node--;
-						
-						cout<<"Remove Successfully !";
-						sleep(1000);
-					}
-					
-					break;
-				}
-			}
-			
-			break;
-		}
-		
-		case 5:{
-			
-			cout<<"\n\n\n\t\tWork under Construction"<<endl;
-			sleep(1);
-			
-			break;
-		}
-		
-		case 6:{
-			
-			temp=head;
-			
-			int count=0,maxx=0;
-			
-			
-			while(temp!=NULL){
-				
-				if(temp->sub_node!=-1){
-					count=temp->node_number;
-					
-					for(int i=temp->sub_node;i>=0;i--){
-						
-						extra_temp=temp->subnode[i];
-						
-						while(temp!=NULL){
-							count++;
-							extra_temp=extra_temp->next;
-						}
-						if(count>maxx)
-						maxx=count;
-						
-					}
-					
-				}
-				
-				temp=temp->next;
-			}
-			
-			cout<<"The answer of the longest chain of main node is : "<<count<<endl;
-			
-			
-			break;
-		}
-		
-		case 7:{
-			
-			temp= head;
-			
-			cout<<"The longest chain of sub node of a main node among the set of node is :  " << chech_all_subnode_max_lenght(temp) <<endl;
-			
-			
-			break;
-		}
-		
-		case 8:{
-			
-			cout<<"\n\n\n\t\tWork under Construction"<<endl;
-			sleep(1);
-			
-			
-			break;
-		}
-		
-			
-			
+bool check(int nodenumber,struct Node *referenceNodeId)
+{//function to check property of sum of all child node number should be less than value of parent child nodenumber
+	int parentNodeNumber=referenceNodeId->nodenumber;
+	int totalSumOfchildNN=0;
+	int i;
+	while(i<referenceNodeId->childReferenceNodeId.size())
+	{
+		totalSumOfchildNN=referenceNodeId->childReferenceNodeId[i]->nodenumber+totalSumOfchildNN;
 	}
+	
+	if((parentNodeNumber-totalSumOfchildNN)<nodenumber)
+	{
+		return(false);
+
+	}
+	else
+	{
+		return(true);	
+	}
+	
+}
+ 
+
+struct Node *createNewNode(int nodenumber,struct Node *referenceNodeId,int day,int month,int year,string ownerid,float value,string ownername)
+{// function for the creation of new node
+	struct Node *temp=(struct Node*)malloc(sizeof(struct Node));
+	bool flag;
+	flag=check(nodenumber,referenceNodeId);
+	
+	if(flag==false)
+	{
+		cout<<"please provide correct NodeNumber it is not possible to create a new node with given Node Number"<<endl;
+		return(temp);
+	}
+	else
+	{
+		temp->nodenumber=nodenumber;
+		temp->referenceNodeId=referenceNodeId;
+		temp->timestamp.day=day;
+		temp->timestamp.month=month;
+		temp->timestamp.year=year;
+		temp->data.ownerId=encrypt(ownerid);	
+		temp->data.value=encryptv(value);
+		temp->data.ownerName=encrypt(ownername);
+		referenceNodeId->childReferenceNodeId.push_back(temp);
 		
-	system("CLS");	
+		return(temp);
+	}
+	
+}
+
+
+int main()
+{
+	struct Node *Genesis=(struct Node*)malloc(sizeof(struct Node));
+	Genesis->referenceNodeId=NULL;//Here I am making parent of Genesis Node as NULL;
+	//Here I am taking Nodenumber for the genesis a hardcode value i.e 100;
+	Genesis->nodenumber=100;
+	//print child of node of Genesis Node
+	createNewNode(50,Genesis,5,6,2018,"A",4000,"nikhil");
+	createNewNode(20,Genesis,15,8,2018,"A",1000,"nikhil");
+	
+	int i=0;
+	cout<<"printing the genesis value"<<endl;
+	cout<<Genesis->nodenumber<<endl;
+	cout<<"printing value of child Node"<<endl;
+	cout<<"printing data without decryption"<<endl;
+	while(i<Genesis->childReferenceNodeId.size())
+	{
+		cout<<Genesis->childReferenceNodeId[i]->nodenumber<<" "<<Genesis->childReferenceNodeId[i]->timestamp.day<<"/"<<Genesis->childReferenceNodeId[i]->timestamp.month<<"/"<<Genesis->childReferenceNodeId[i]->timestamp.year<<" "<<Genesis->childReferenceNodeId[i]->data.ownerId<<" "<<(Genesis->childReferenceNodeId[i]->data.value)<<" "<<Genesis->childReferenceNodeId[i]->data.ownerName<<endl;
 		
-	}while(module != 0);
+		i=i+1;
+	}
+	i=0;
+	cout<<"Data after Decryption"<<endl;
+	while(i<Genesis->childReferenceNodeId.size())
+	{
+		cout<<Genesis->childReferenceNodeId[i]->nodenumber<<" "<<Genesis->childReferenceNodeId[i]->timestamp.day<<"/"<<Genesis->childReferenceNodeId[i]->timestamp.month<<"/"<<Genesis->childReferenceNodeId[i]->timestamp.year<<" "<<decrypt(Genesis->childReferenceNodeId[i]->data.ownerId)<<" "<<decryptv(Genesis->childReferenceNodeId[i]->data.value)<<" "<<decrypt(Genesis->childReferenceNodeId[i]->data.ownerName)<<endl;
 		
-	 	
-	return 0;
+		i=i+1;
+	}
+
+	return(0);
 }
